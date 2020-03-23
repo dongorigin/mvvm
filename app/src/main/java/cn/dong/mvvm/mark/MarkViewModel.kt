@@ -25,7 +25,7 @@ class MarkViewModel : ViewModel() {
             } else {
                 selectMarks.remove(mark)
             }
-            updateMarks()
+            notifyMarksUpdated()
         }
     }
 
@@ -34,7 +34,7 @@ class MarkViewModel : ViewModel() {
             val mark = selectMarks[position]
             mark.selected = false
             selectMarks.remove(mark)
-            updateMarks()
+            notifyMarksUpdated()
         }
     }
 
@@ -45,7 +45,7 @@ class MarkViewModel : ViewModel() {
     private fun testData() {
         val testMarks = MutableList(10) { Mark(it.toString()) }
         allMarks.addAll(testMarks)
-        updateMarks()
+        notifyMarksUpdated()
     }
 
     fun saveSelectMarks() {
@@ -53,8 +53,11 @@ class MarkViewModel : ViewModel() {
         selectMarks
     }
 
-    private fun updateMarks() {
-        allMarksData.value = allMarks.map { it.copy() }
-        selectMarksData.value = selectMarks.map { it.copy() }
+    private fun notifyMarksUpdated() {
+        // 深拷贝是为了 DiffUtils 能对比列表数据变化，也是为了保护数据源
+        allMarksData.value = allMarks.deepCopy()
+        selectMarksData.value = selectMarks.deepCopy()
     }
+
+    private fun List<Mark>.deepCopy() : List<Mark> = map { it.copy() }
 }
